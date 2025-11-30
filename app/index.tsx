@@ -44,7 +44,7 @@ export default function HomeScreen() {
 
       <TouchableOpacity
         style={styles.profileIcon}
-        onPress={() => router.push("/view_stories")}
+          onPress={() => router.push("/register")}
       >
         <Image
           source={require('../assets/pajamas_profile.png')}
@@ -67,7 +67,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.button, styles.trailButton]}
-          onPress={() => router.push("/create_trail")}>
+          onPress={() => router.push("/create_trail_list")}>
           <Image source={require('../assets/trailicon.png')} style={styles.icon} />
           <Text style={styles.buttonText}>Create Trail List</Text>
         </TouchableOpacity>

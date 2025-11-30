@@ -100,7 +100,8 @@ export default function ViewStories() {
           style={styles.logo}
         />
 
-        <TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => router.push("/bookmark_stories")}>
           <Image
           source={require("../assets/jam_menu.png")}
           style={{ width: 40, height: 40, resizeMode: "contain" }}
