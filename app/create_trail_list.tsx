@@ -1,14 +1,13 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 interface Package {
@@ -63,13 +62,11 @@ export default function CreateTrailListScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#4A5F7F" />
+    <View style={styles.container}>
+
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backText}>‹</Text>
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Trail</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -141,27 +138,30 @@ export default function CreateTrailListScreen() {
           <Text style={styles.nextText}>Next</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#E8EAED",
+    backgroundColor: "#c8c8c8ff",
   },
   header: {
+    marginTop: 60,
     backgroundColor: "#4A5F7F",
     paddingVertical: 16,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderRadius: 12,
+    width: "90%",
+    alignSelf: "center",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   headerTitle: {
     fontSize: 20,
+    width: "100%",
     fontWeight: "700",
     color: "#fff",
     textAlign: "center",
@@ -198,6 +198,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
+  },
+
+  backBtn: {
+    width: 30,
+    height: 40,
+    resizeMode: "contain",
   },
   packageCardSelected: {
     borderColor: "#4A5F7F",

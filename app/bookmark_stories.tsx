@@ -1,288 +1,206 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useRef, useState } from "react";
 import {
-    FlatList,
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Dimensions,
+  FlatList,
+  Image,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
-type Story = {
-  id: string;
-  title: string;
-  location: string;
-  description: string;
-  distance: string;
-  fromStory: string;
-  image: string;
-};
+const { width } = Dimensions.get("window");
+const VISIBLE_BOOKMARKS = 3;
 
-const bookmarked = [
-  {
-    id: "b1",
-    title: "Opera House",
-    image: "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=500&q=60",
-  },
-  {
-    id: "b2",
-    title: "Haymarket",
-    image: "https://images.unsplash.com/photo-1506976785307-8732e854ad89?auto=format&fit=crop&w=500&q=60",
-  },
-  {
-    id: "b3",
-    title: "Opera House",
-    image: "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=500&q=60",
-  },
+type Bookmark = { id: string; title: string; image: string; };
+type Story = { id: string; title: string; subtitle: string; distance: string; duration: string; views: number; image: string; bookmarkId: string; };
+
+const bookmarked: Bookmark[] = [
+  { id: "b1", title: "Opera House", image: "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=500&q=60" },
+  { id: "b2", title: "Haymarket", image: "https://www.cityofsydney.nsw.gov.au/-/jssmedia/corporate/images/general/haymarket-precinct/dixonstreet_gates.jpg?mw=640" },
+  { id: "b3", title: "Circular Quay", image: "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=500&q=60" },
+  { id: "b4", title: "Circular Quay2", image: "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=500&q=60" },
 ];
 
-const stories: Story[] = [
-  {
-    id: "s1",
-    title: "Haymarket - Henry Fine Chang",
-    location: "Haymarket - Sydney Metro Station",
-    description: "The largest Asian community in the world welcomes you with food, culture, and vibrant streets.",
-    distance: "14m",
-    fromStory: "5.8km from story B",
-    image: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?auto=format&fit=crop&w=500&q=60",
-  },
-  {
-    id: "s2",
-    title: "Circular Quay - Sydney Opera House",
-    location: "Circular Quay - Sydney Opera House",
-    description: "Admire Sydney’s world-famous harbour icon from every angle as you approach the concourse.",
-    distance: "14m",
-    fromStory: "5.8km from story B",
-    image: "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=500&q=60",
-  },
-  {
-    id: "s3",
-    title: "Haymarket - Henry Fine Chang",
-    location: "Haymarket - Sydney Metro Station",
-    description: "Enjoy buzzing markets and hidden eateries as you explore the city’s historic Chinatown district.",
-    distance: "14m",
-    fromStory: "5.8km from story B",
-    image: "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=500&q=60",
-  },
+const allStories: Story[] = [
+  { id: "s1", title: "Haymarket - Henry Fine Chang", subtitle: "Henry Fine Chang migrated to Sydney in 1877. Successful...", distance: "Distance from story: 50 m", duration: "14m", views: 95, image: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?auto=format&fit=crop&w=500&q=60", bookmarkId: "b2" },
+  { id: "s2", title: "Circular Quay - Sydney Opera House", subtitle: "The Sydney Harbour Bridge is an iconic steel arch bridge...", distance: "Distance from story: 280 m", duration: "18m", views: 20000, image: "https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=500&q=60", bookmarkId: "b3" },
+  { id: "s3", title: "Haymarket - Henry Fine Chang", subtitle: "Henry Fine Chang opened a small grocery shop near the market...", distance: "Distance from story: 60 m", duration: "12m", views: 140, image: "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=500&q=60", bookmarkId: "b2" },
+  { id: "s4", title: "Haymarket - Chinatown Gate", subtitle: "Walk through the iconic Chinatown gate and discover local food...", distance: "Distance from story: 80 m", duration: "10m", views: 320, image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=500&q=60", bookmarkId: "b2" },
+  { id: "s5", title: "Opera House - Harbour View", subtitle: "Discover how the Opera House changed Sydney’s skyline forever...", distance: "Distance from story: 150 m", duration: "16m", views: 12500, image: "https://images.unsplash.com/photo-1483683804023-6ccdb62f86ef?auto=format&fit=crop&w=500&q=60", bookmarkId: "b1" },
+  { id: "s6", title: "Opera House - Backstage Stories", subtitle: "Behind the scenes of world-class performances and concerts...", distance: "Distance from story: 190 m", duration: "20m", views: 8600, image: "https://images.unsplash.com/photo-1526481280695-3c687fd543c0?auto=format&fit=crop&w=500&q=60", bookmarkId: "b1" },
+  { id: "s7", title: "Circular Quay - Harbour Views", subtitle: "Walk along the waterfront and enjoy stunning views of the city...", distance: "Distance from story: 120 m", duration: "11m", views: 9800, image: "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=500&q=60", bookmarkId: "b4" },
+  { id: "s8", title: "Circular Quay - Ferry Stories", subtitle: "Learn how ferries connected suburbs and shaped daily life...", distance: "Distance from story: 210 m", duration: "9m", views: 4300, image: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=500&q=60", bookmarkId: "b3" },
+  { id: "s9", title: "Haymarket - Market Life", subtitle: "Stories from stall owners and families working at the market...", distance: "Distance from story: 40 m", duration: "13m", views: 510, image: "https://images.unsplash.com/photo-1534297635766-a262cdcb6b0b?auto=format&fit=crop&w=500&q=60", bookmarkId: "b2" },
+  { id: "s10", title: "Opera House - Design & Architecture", subtitle: "Discover the bold ideas behind the Opera House design...", distance: "Distance from story: 200 m", duration: "17m", views: 15700, image: "https://images.unsplash.com/photo-1526481280693-3b113a133871?auto=format&fit=crop&w=500&q=60", bookmarkId: "b1" },
 ];
+
+// Mảng màu pastel để random màu FlatList
+const colors = ["#FFF9F2", "#F2F1FF", "#FFF1F2", "#F2FFF4", "#FFFFF2", "#F6E2B3", "#C3F0CA"];
 
 export default function BookmarkedStoriesScreen() {
   const router = useRouter();
+  const [bookmarksOrder, setBookmarksOrder] = useState(bookmarked);
+  const [selectedBookmark, setSelectedBookmark] = useState(bookmarked[1].id);
 
-  const renderStory = ({ item }: { item: Story }) => (
-    <View style={styles.storyCard}>
-      <Image source={{ uri: item.image }} style={styles.storyImage} />
-      <View style={styles.storyContent}>
-        <Text style={styles.storyTitle}>{item.title}</Text>
-        <Text style={styles.storyLocation}>{item.location}</Text>
-        <Text style={styles.storyDescription} numberOfLines={2}>
-          {item.description}
-        </Text>
-        <View style={styles.storyMetaRow}>
-          <View>
-            <Text style={styles.storyDistance}>{item.distance}</Text>
-            <Text style={styles.storyFrom}>{item.fromStory}</Text>
+  const scaleAnims = useRef(
+    bookmarked.reduce((acc, b) => {
+      acc[b.id] = new Animated.Value(b.id === selectedBookmark ? 1.2 : 0.85);
+      return acc;
+    }, {} as { [key: string]: Animated.Value })
+  ).current;
+
+  const filteredStories = allStories.filter(s => s.bookmarkId === selectedBookmark);
+
+  const animateScale = (centerId: string) => {
+    bookmarksOrder.forEach(b => {
+      Animated.spring(scaleAnims[b.id], {
+        toValue: b.id === centerId ? 1.2 : 0.85,
+        useNativeDriver: true,
+      }).start();
+    });
+  };
+
+  const rotateRight = () => {
+    const newOrder = [...bookmarksOrder];
+    newOrder.push(newOrder.shift()!); 
+    setBookmarksOrder(newOrder);
+    setSelectedBookmark(newOrder[1].id);
+    animateScale(newOrder[1].id);
+  };
+
+  const rotateLeft = () => {
+    const newOrder = [...bookmarksOrder];
+    newOrder.unshift(newOrder.pop()!); 
+    setBookmarksOrder(newOrder);
+    setSelectedBookmark(newOrder[1].id);
+    animateScale(newOrder[1].id);
+  };
+
+  const renderStory = ({ item, index }: { item: Story; index: number }) => {
+    const backgroundColor = colors[index % colors.length]; // màu random theo index
+    return (
+      <TouchableOpacity style={[styles.storyCard, { backgroundColor }]} activeOpacity={0.8}>
+        <Image source={{ uri: item.image }} style={styles.storyImage} />
+        <View style={styles.storyContent}>
+          <View style={styles.storyHeader}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.storyTitle} numberOfLines={1}>{item.title}</Text>
+              <Text style={styles.storySubtitle} numberOfLines={1}>{item.subtitle}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={28} color="#999" style={styles.arrowButton2} />
           </View>
-          <TouchableOpacity style={styles.storyAction}>
-            <Ionicons name="arrow-forward" size={18} color="#3A4452" />
-          </TouchableOpacity>
+          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 5 }}>
+              <View style={styles.distanceContainer}>
+                <Text style={styles.storyDistance}>{item.distance}</Text>
+              </View>
+              <View style={styles.storyFooter}>
+                <View style={styles.viewsContainer}>
+                  <Ionicons name="eye-outline" size={12} color="#666" />
+                  <Text style={styles.viewsText}>{item.views >= 1000 ? `${(item.views / 1000).toFixed(0)}k` : item.views}</Text>
+                </View>
+              </View>
+          </View>
         </View>
-      </View>
-    </View>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
           <Ionicons name="chevron-back" size={28} color="#000" />
         </TouchableOpacity>
         <Image source={require("../assets/YSLogo.png")} style={styles.logo} />
-        <View style={styles.headerIcons}>
-          <Ionicons name="bookmark-outline" size={22} color="#000" />
-          <Ionicons name="notifications-outline" size={22} color="#000" style={{ marginLeft: 12 }} />
+        <View style={{ width: 40 }} />
+      </View>
+
+      <View style={styles.bookmarkSection}>
+        <View style={styles.badgeWrapper}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>Bookmarked Stories</Text>
+          </View>
+        </View>
+
+        <View style={styles.bookmarkRow}>
+          <TouchableOpacity onPress={rotateLeft} style={styles.arrowButton}>
+            <Ionicons name="chevron-back" size={28} color="#444" />
+          </TouchableOpacity>
+
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", flex: 1 }}>
+            {bookmarksOrder.slice(0, VISIBLE_BOOKMARKS).map((b, i) => {
+              const isCenter = i === 1;
+              return (
+                <Animated.View
+                  key={b.id}
+                  style={{
+                    alignItems: "center",
+                    marginHorizontal: 10,
+                    transform: [{ scale: scaleAnims[b.id] }],
+                  }}
+                >
+                  <Image source={{ uri: b.image }} style={styles.circleImage} />
+                  <Text style={[styles.circleLabel, isCenter && styles.circleLabelSelected]}>{b.title}</Text>
+                </Animated.View>
+              );
+            })}
+          </View>
+
+          <TouchableOpacity onPress={rotateRight} style={styles.arrowButton}>
+            <Ionicons name="chevron-forward" size={28} color="#444" />
+          </TouchableOpacity>
         </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Bookmarked Stories</Text>
-        </View>
+      <View style={styles.listHeader}>
+        <Text style={styles.listTitle}>Stories List</Text>
+      </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.bookmarkRow}
-        >
-          {bookmarked.map((item) => (
-            <View key={item.id} style={styles.bookmarkCard}>
-              <Image source={{ uri: item.image }} style={styles.bookmarkImage} />
-              <Text style={styles.bookmarkTitle}>{item.title}</Text>
-            </View>
-          ))}
-        </ScrollView>
-
-        <View style={styles.listHeaderRow}>
-          <Text style={styles.storiesListTitle}>Stories List</Text>
-          <TouchableOpacity style={styles.sortPill}>
-            <Ionicons name="list-outline" size={16} color="#3A4452" />
-            <Text style={styles.sortText}>Sort by</Text>
-          </TouchableOpacity>
-        </View>
-
-        <FlatList
-          data={stories}
-          keyExtractor={(item) => item.id}
-          renderItem={renderStory}
-          scrollEnabled={false}
-          contentContainerStyle={{ paddingBottom: 40 }}
-        />
-      </ScrollView>
+      <FlatList
+        data={filteredStories}
+        keyExtractor={(item) => item.id}
+        renderItem={renderStory}
+        scrollEnabled={false}
+        contentContainerStyle={styles.storiesList}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FAFAFA",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  logo: {
-    width: 60,
-    height: 40,
-    resizeMode: "contain",
-  },
-  headerIcons: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  sectionHeader: {
-    alignSelf: "flex-start",
-    marginLeft: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    backgroundColor: "#E7F5E8",
-    borderRadius: 12,
-    marginTop: 8,
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#3A4452",
-  },
-  bookmarkRow: {
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-  },
-  bookmarkCard: {
-    alignItems: "center",
-    marginRight: 16,
-  },
-  bookmarkImage: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    marginBottom: 6,
-  },
-  bookmarkTitle: {
-    fontSize: 12,
-    color: "#3A4452",
-  },
-  listHeaderRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    marginBottom: 8,
-  },
-  storiesListTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#333",
-  },
-  sortPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F0F1F3",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  sortText: {
-    marginLeft: 6,
-    fontSize: 12,
-    color: "#3A4452",
-  },
-  storyCard: {
-    flexDirection: "row",
-    marginHorizontal: 16,
-    marginBottom: 12,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    overflow: "hidden",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOpacity: 0.07,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  storyImage: {
-    width: 100,
-    height: "100%",
-  },
-  storyContent: {
-    flex: 1,
-    padding: 12,
-  },
-  storyTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#2F3542",
-  },
-  storyLocation: {
-    fontSize: 12,
-    color: "#6B7280",
-    marginVertical: 2,
-  },
-  storyDescription: {
-    fontSize: 12,
-    color: "#4B5563",
-    marginBottom: 8,
-  },
-  storyMetaRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  storyDistance: {
-    fontSize: 12,
-    color: "#2F855A",
-    fontWeight: "600",
-  },
-  storyFrom: {
-    fontSize: 10,
-    color: "#9CA3AF",
-  },
-  storyAction: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    backgroundColor: "#EDEFF3",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  container: { flex: 1, backgroundColor: "#ffffff",  },
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 12},
+  headerButton: { padding: 6, width: 40, height: 40, justifyContent: "center", alignItems: "center" },
+  logo: { width: 50, height: 50, resizeMode: "contain" },
+  bookmarkSection: { backgroundColor: "#FAF6F6", paddingBottom: 40, },
+  badgeWrapper: { paddingHorizontal: 10, marginTop: 10 },
+  badge: { alignSelf: "flex-start", backgroundColor: "#D4F4DD", paddingHorizontal: 14, paddingVertical: 6, borderRadius: 8 },
+  badgeText: { fontSize: 15, fontWeight: "600", color: "#2D5F3F" },
+  bookmarkRow: {  flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 14 },
+  arrowButton: { padding: 8, },
+  arrowButton2: { paddingTop: 8, },
+  circleImage: { width: 85, height: 85, borderRadius: 42.5 },
+  circleLabel: { fontSize: 12, color: "#999", marginTop: 4 },
+  circleLabelSelected: { fontSize: 13, fontWeight: "700", color: "#000" },
+  listHeader: { paddingHorizontal: 16, paddingTop: 24, paddingBottom: 10 },
+  listTitle: { fontSize: 18, fontWeight: "700" },
+  storiesList: { paddingHorizontal: 16, paddingBottom: 40, },
+  storyCard: { flexDirection: "row", padding: 12, borderRadius: 12, marginBottom: 12, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 3, elevation: 1, borderColor: "#B7B7B7", borderWidth: 0.2, },
+  storyImage: { width: 60, height: 60, borderRadius: 30 },
+  storyContent: { flex: 1, marginLeft: 12 },
+  storyHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
+  storyTitle: { fontSize: 14, fontWeight: "700" },
+  storySubtitle: { fontSize: 11, color: "#666", marginTop: 2, marginBottom: 4 },
+  distanceContainer: { backgroundColor: "#EEE", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, width: undefined, alignSelf: "flex-start" },
+  storyDistance: { fontSize: 10, color: "#555", },
+  storyFooter: { flexDirection: "row", justifyContent: "flex-end", marginTop: 6 },
+  viewsContainer: { flexDirection: "row",  paddingHorizontal: 8, paddingVertical: 0,  alignItems: "center" },
+  viewsText: { fontSize: 8, marginLeft: 4, color: "#666" },
 });

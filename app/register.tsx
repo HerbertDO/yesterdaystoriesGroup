@@ -1,5 +1,5 @@
+import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import React from 'react';
 import {
   Image,
   ImageBackground,
@@ -9,215 +9,174 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
+} from "react-native";
 
 const RegisterScreen = () => {
-  const handleFacebookSignUp = () => {
-    console.log('Facebook sign up');
-  };
-
   const router = useRouter();
-
-  const handleAppleSignUp = () => {
-    console.log('Apple sign up');
-  };
-
-  const handleGoogleSignUp = () => {
-    console.log('Google sign up');
-  };
-
-  const handleEmailSignUp = () => {
-    console.log('Email sign up');
-  };
-
-  const handleBack = () => {
-    console.log('Go back');
-  };
+  const navigation = useNavigation();
 
   return (
-    <ImageBackground 
-      source={require('../assets/bg.png')}
-      style={styles.backgroundImage}
-      resizeMode="cover"
-    >
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" />
-        <TouchableOpacity onPress={() => router.back()}>
-                  <Image
-                              source={require("../assets/weui_back-filled.png")}
-                              style={{ width: 30, height: 40, resizeMode: "contain" }}
-                            />
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
+      <ImageBackground
+        source={require("../assets/bg.png")}
+        style={styles.bgImage}
+        resizeMode="cover"
+      >
+        <View style={styles.bgOverlay} />
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}>
+          <Image
+            source={require("../assets/weui_back-filled.png")}
+            style={{ width: 30, height: 40, resizeMode: "contain" }}
+          />
         </TouchableOpacity>
-
-        {/* Logo */}
         <View style={styles.logoContainer}>
-          <Image 
-            source={require('../assets/logo.png')}
+          <Image
+            source={require("../assets/YSLogo.png")}
             style={styles.logoImage}
             resizeMode="contain"
           />
-          <Text style={styles.logoTitle}>Yesterday Stories</Text>
         </View>
-
-        {/* Register Title */}
-        <Text style={styles.title}>Register</Text>
-
-        {/* Sign Up Buttons */}
-        <View style={styles.buttonsContainer}>
-          {/* Facebook Button */}
-          <TouchableOpacity 
-            style={[styles.button, styles.facebookButton]}
-            onPress={handleFacebookSignUp}
-          >
-            <Image 
-              source={require('../assets/fb.png')}
-              style={styles.buttonIcon}
-              resizeMode="contain"
+        <View style={styles.card}>
+          <Text style={styles.title}>Register</Text>
+          <TouchableOpacity style={[styles.button, styles.facebookButton]}>
+            <Image
+              source={require("../assets/fb.png")}
+              style={styles.iconImage}
             />
             <Text style={styles.buttonText}>Sign up with Facebook</Text>
           </TouchableOpacity>
 
-          {/* Apple Button */}
-          <TouchableOpacity 
-            style={[styles.button, styles.appleButton]}
-            onPress={handleAppleSignUp}
-          >
-            <Image 
-              source={require('../assets/apple.png')}
-              style={styles.buttonIcon}
-              resizeMode="contain"
+          {/* Apple button */}
+          <TouchableOpacity style={[styles.button, styles.appleButton]}>
+            <Image
+              source={require("../assets/apple.png")}
+              style={styles.iconImage}
             />
-            <Text style={[styles.buttonText, styles.appleButtonText]}>
-              Sign up with Apple
-            </Text>
+            <Text style={styles.buttonText}>Sign up with Apple</Text>
           </TouchableOpacity>
-
-          {/* Google Button */}
-          <TouchableOpacity 
-            style={[styles.button, styles.googleButton]}
-            onPress={handleGoogleSignUp}
-          >
-            <Image 
-              source={require('../assets/google.png')}
-              style={styles.buttonIcon}
-              resizeMode="contain"
+          <TouchableOpacity style={[styles.button, styles.googleButton]}>
+            <Image
+              source={require("../assets/google.png")}
+              style={styles.iconImage}
             />
-            <Text style={[styles.buttonText, styles.googleButtonText]}>
-              Sign up with Google
-            </Text>
-          </TouchableOpacity>
-
-          {/* Email Button */}
-          <TouchableOpacity 
-            style={styles.emailButton}
-            onPress={handleEmailSignUp}
-          >
-            <Text style={styles.emailButtonText}>Register with Email</Text>
+            <Text style={styles.googleText}>Sign up with Google</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Bottom Logo */}
-        <Text style={styles.bottomLogo}>Yesterday Stories</Text>
-      </SafeAreaView>
-    </ImageBackground>
+        <View style={styles.bottomSection}>
+          <TouchableOpacity onPress={() => router.push("/regpage")}>
+            <Text style={styles.emailLink}>Register with Email</Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
+
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
-    paddingHorizontal: 20,
+    backgroundColor: "#FFF",
   },
+  bgImage: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+  },
+  bgOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255,255,255,0.75)",
+  },
+
   backButton: {
-    marginTop: 10,
-    marginBottom: 20,
-    width: 40,
+    position: "absolute",
+    top: 10,
+    left: 12,
+    zIndex: 20,
+    padding: 5,
   },
-  backIcon: {
-    fontSize: 36,
-    color: '#000',
-    fontWeight: '300',
-  },
+
   logoContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
+    marginTop: 40,
+    alignItems: "center",
   },
   logoImage: {
-    width: 80,
-    height: 80,
-    marginBottom: 10,
+    width: 171,
+    height: 171,
   },
   logoTitle: {
+    marginTop: 6,
     fontSize: 14,
-    color: '#000',
-    fontWeight: '500',
+    color: "#333",
+  },
+
+  card: {
+    width: "85%",
+    marginTop: 32,
+    paddingVertical: 26,
+    paddingHorizontal: 22,
+    borderRadius: 26,
+    backgroundColor: "rgba(255,255,255,0.9)",
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 5,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '600',
-    color: '#000',
-    marginBottom: 30,
+    fontSize: 30,
+    fontWeight: "700",
+    marginBottom: 26,
   },
-  buttonsContainer: {
-    width: '100%',
-  },
+
   button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 14,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  buttonIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
+    height: 54,
+    borderRadius: 12,
+    marginBottom: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   facebookButton: {
-    backgroundColor: '#1877F2',
+    backgroundColor: "#1877F2",
   },
   appleButton: {
-    backgroundColor: '#000',
-  },
-  appleButtonText: {
-    marginLeft: 0,
+    backgroundColor: "#000",
   },
   googleButton: {
-    backgroundColor: '#fff',
+    backgroundColor: "#FFF",
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#DDD",
+  },
+  iconImage: {
+    width: 20,
+    height: 20,
+    resizeMode: "contain",
+    marginRight: 10,
   },
   buttonText: {
+    color: "#FFF",
     fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
   },
-  googleButtonText: {
-    color: '#000',
+  googleText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "600",
   },
-  emailButton: {
-    alignItems: 'center',
-    marginTop: 10,
+
+  bottomSection: {
+    marginTop: 30,
+    alignItems: "center",
   },
-  emailButtonText: {
-    fontSize: 14,
-    color: '#4A90E2',
-    fontWeight: '500',
-  },
-  bottomLogo: {
-    position: 'absolute',
-    bottom: 40,
-    alignSelf: 'center',
-    fontSize: 24,
-    fontWeight: '300',
-    color: '#E8E8E8',
+  emailLink: {
+    fontSize: 15,
+    textDecorationLine: "underline",
+    marginTop: 4,
+    color: "#2f66dbff",
   },
 });
 

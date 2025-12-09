@@ -5,6 +5,7 @@ import {
   Image,
   Platform,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TextInput,
@@ -84,6 +85,8 @@ export default function EditTrailScreen() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "#F6F4F2" }}>
+
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Image
@@ -270,7 +273,7 @@ export default function EditTrailScreen() {
           )}
         </View>
 
-        <TouchableOpacity style={styles.updateBtnRight}>
+        <TouchableOpacity style={styles.updateBtnRight} onPress={() => router.push("/paymentgway")}>
           <Text style={styles.updateText}>Update</Text>
         </TouchableOpacity>
       </View>

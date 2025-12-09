@@ -44,7 +44,7 @@ export default function HomeScreen() {
 
       <TouchableOpacity
         style={styles.profileIcon}
-          onPress={() => router.push("/register")}
+          onPress={() => router.push("/LoginScreen")}
       >
         <Image
           source={require('../assets/pajamas_profile.png')}
@@ -61,7 +61,8 @@ export default function HomeScreen() {
           <Text style={styles.buttonText}>View Stories</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, styles.uploadButton]}>
+        <TouchableOpacity style={[styles.button, styles.uploadButton]} 
+          onPress={() => router.push("/CreateStoryScreen")}>
           <Image source={require('../assets/uploadicon.png')} style={styles.icon} />
           <Text style={styles.buttonText}>Upload Stories</Text>
         </TouchableOpacity>
